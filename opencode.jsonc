@@ -1,0 +1,46 @@
+{
+  // Server-wide defaults for this OpenCode server.
+  //
+  // This is the *global* config for the service user, so it applies to every
+  // session no matter which project it runs in. A project's own
+  // opencode.jsonc can tighten these, but it cannot lift the policies below.
+  "$schema": "https://opencode.ai/config.json",
+
+  // Default model for sessions that do not pick one.
+  // Connect a provider first (see README), then uncomment and adjust:
+  // "model": "anthropic/claude-sonnet-4-5",
+
+  // Install updates automatically. A running server is never restarted for
+  // you, so activate an installed update with: systemctl restart opencode
+  "update": "auto",
+
+  // Ordered rules; the LAST matching rule wins, so ours come after defaults.
+  "permissions": [
+    // Anything outside the project tree needs a human...
+    { "action": "external_directory", "resource": "*", "effect": "ask" },
+
+    // ...except the projects directory, so unattended work does not stall on
+    // a prompt nobody is there to answer. install.sh rewrites this path if
+    // you pass --projects.
+    { "action": "external_directory", "resource": "/srv/projects/*", "effect": "allow" },
+
+    // Secrets stay out of the agent's reach.
+    { "action": "read", "resource": "*.env", "effect": "deny" },
+    { "action": "read", "resource": "*.env.*", "effect": "deny" },
+    { "action": "read", "resource": "*.env.example", "effect": "allow" },
+    { "action": "read", "resource": "*id_rsa*", "effect": "deny" },
+    { "action": "read", "resource": "*.pem", "effect": "deny" },
+
+    // Normal work runs unattended. These two never do.
+    { "action": "shell", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "git push *", "effect": "deny" },
+    { "action": "shell", "resource": "sudo *", "effect": "deny" }
+  ],
+
+  // Hard blocks. Unlike permissions, these cannot be lifted by a project
+  // config or by an "Allow always" approval.
+  "policies": [
+    { "action": "tool.use", "resource": "shell:sudo *", "effect": "deny" },
+    { "action": "tool.use", "resource": "shell:git push *", "effect": "deny" }
+  ]
+}

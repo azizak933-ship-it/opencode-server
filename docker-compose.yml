@@ -1,0 +1,33 @@
+# Optional container deployment, as an alternative to install.sh.
+#
+#   docker compose up -d
+#
+# Two things to know before you rely on this:
+#
+#   * The documented form is a versioned tag, e.g. ghcr.io/anomalyco/opencode:2.0.0.
+#     Pin the tag you have actually pulled and tested; bump it deliberately.
+#   * The native install (install.sh) sets up the *shared background service*,
+#     which is what browser, phone and desktop pairing is documented against.
+#     If `opencode pair` is unavailable in this container, use install.sh instead.
+#
+# The port is bound to loopback: put a tunnel, VPN or reverse proxy in front
+# rather than exposing it directly.
+services:
+  opencode:
+    image: ghcr.io/anomalyco/opencode:2.0.0
+    command: ["serve", "--hostname", "0.0.0.0", "--port", "4096"]
+    ports:
+      - "127.0.0.1:4096:4096"
+    restart: unless-stopped
+    environment:
+      HOME: /home/opencode
+    volumes:
+      - config:/home/opencode/.config/opencode
+      - data:/home/opencode/.local/share/opencode
+      - state:/home/opencode/.local/state/opencode
+      - ./projects:/srv/projects
+
+volumes:
+  config:
+  data:
+  state:

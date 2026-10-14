@@ -1,0 +1,12 @@
+[Unit]
+Description=Ensure the OpenCode server is running
+
+[Service]
+Type=oneshot
+User=opencode
+Group=opencode
+Environment=HOME=/home/opencode
+EnvironmentFile=-/etc/opencode/env
+# Idempotent: only starts the server if it is not already running. Enable this
+# through opencode-ensure.timer, never directly.
+ExecStart=/bin/sh -c '/usr/local/bin/opencode service status >/dev/null 2>&1 || /usr/local/bin/opencode service start'

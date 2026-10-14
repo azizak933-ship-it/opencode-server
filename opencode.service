@@ -1,0 +1,23 @@
+[Unit]
+Description=OpenCode server
+Documentation=https://opencode.ai/v2/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# `opencode service start` launches the shared background server and returns,
+# so this is a oneshot that stays "active (exited)" while the server runs.
+# Pairing against the shared service is what gives browser, phone and desktop
+# clients their login links, so we deliberately do not use a private server.
+Type=oneshot
+RemainAfterExit=yes
+User=opencode
+Group=opencode
+Environment=HOME=/home/opencode
+EnvironmentFile=-/etc/opencode/env
+ExecStart=/usr/local/bin/opencode service start
+ExecStop=/usr/local/bin/opencode service stop
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target

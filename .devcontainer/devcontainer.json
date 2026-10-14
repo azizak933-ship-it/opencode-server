@@ -1,0 +1,17 @@
+{
+  "name": "OpenCode server",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/setup.sh",
+  "forwardPorts": [49374],
+  "portsAttributes": {
+    "49374": {
+      "label": "OpenCode",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    }
+  }
+}
